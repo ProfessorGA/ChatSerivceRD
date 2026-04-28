@@ -37,6 +37,7 @@ export class HomeComponent {
     this.http.post<any>(`${this.apiUrl}/create`, { phoneNumber: this.phoneNumber })
       .subscribe({
         next: (res) => {
+          console.log('Create Invite API Response:', res);
           this.roomId = res.roomId;
           this.inviteLink = res.inviteLink;
           this.smsSent = res.smsSent;
