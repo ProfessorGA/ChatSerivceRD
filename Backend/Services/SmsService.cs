@@ -52,10 +52,9 @@ namespace Backend.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to send SMS via Twilio to {toPhoneNumber}");
-                // Fallback
-                _logger.LogInformation($"[FALLBACK SMS] To: {toPhoneNumber} | Message: Hi, click here to claim 100000/- amount in your account: {inviteLink} . To avoid, click here: {avoidLink}");
-                return true; 
+                return false; 
             }
+
         }
     }
 }
