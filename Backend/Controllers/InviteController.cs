@@ -27,10 +27,17 @@ namespace Backend.Controllers
 
             var roomId = _roomService.CreateRoom(request.PhoneNumber);
             
-            // Generate invite link
-            // Assuming frontend runs on localhost:4200 for now, or we can pass base URL from config
             var frontendUrl = "http://localhost:4200"; // Fallback
+            if (Request.Headers.TryGetValue("Origin", out var originValues))
+            {
+                var origin = originValues.FirstOrDefault();
+                if (!string.IsNullOrEmpty(origin))
+                {
+                    frontendUrl = origin.TrimEnd('/');
+                }
+            }
             var inviteLink = $"{frontendUrl}/join/{roomId}";
+
 
             bool smsSent = _smsService.SendInviteSms(request.PhoneNumber, inviteLink);
 
