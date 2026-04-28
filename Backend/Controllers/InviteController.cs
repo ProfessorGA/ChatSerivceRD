@@ -39,13 +39,15 @@ namespace Backend.Controllers
             var inviteLink = $"{frontendUrl}/join/{roomId}";
 
 
-            bool smsSent = _smsService.SendInviteSms(request.PhoneNumber, inviteLink);
+            var (smsSent, errorMessage) = _smsService.SendInviteSms(request.PhoneNumber, inviteLink);
 
             return Ok(new 
             { 
                 roomId = roomId, 
                 inviteLink = inviteLink, 
                 smsSent = smsSent,
+                errorMessage = errorMessage,
+
                 message = "Invite created successfully."
             });
         }

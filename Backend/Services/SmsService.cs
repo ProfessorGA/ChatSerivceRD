@@ -8,7 +8,8 @@ namespace Backend.Services
 {
     public interface ISmsService
     {
-        bool SendInviteSms(string toPhoneNumber, string inviteLink);
+        (bool success, string? errorMessage) SendInviteSms(string toPhoneNumber, string inviteLink);
+
     }
 
     public class SmsService : ISmsService
@@ -22,7 +23,7 @@ namespace Backend.Services
             _configuration = configuration;
         }
 
-        public bool SendInviteSms(string toPhoneNumber, string inviteLink)
+        public (bool success, string? errorMessage) SendInviteSms(string toPhoneNumber, string inviteLink)
         {
             var accountSid = _configuration["Twilio:AccountSid"];
             var authToken = _configuration["Twilio:AuthToken"];
@@ -33,7 +34,7 @@ namespace Backend.Services
             {
                 _logger.LogWarning("Twilio credentials missing. Fallback to console logging.");
                 _logger.LogInformation($"[MOCK SMS] To: {toPhoneNumber} | Message: Hi, click here to claim 100000/- amount in your account: {inviteLink} . To avoid, click here: {avoidLink}");
-                return true; // Return true as fallback success
+                return (true, null);
             }
 
             try
@@ -47,14 +48,14 @@ namespace Backend.Services
                 );
 
                 _logger.LogInformation($"SMS sent via Twilio. SID: {message.Sid}");
-                return true;
+                return (true, null);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to send SMS via Twilio to {toPhoneNumber}");
-                return false; 
+                return (false, ex.Message); 
             }
-
         }
+
     }
 }
