@@ -57,10 +57,8 @@ namespace Backend.Hubs
         public async Task SendMessage(string roomId, string message)
         {
             _roomService.UpdateActivity(roomId);
-            // Broadcast message to everyone in the room except sender, or include sender?
-            // Usually include sender for simplicity, or let sender append locally.
-            // Let's broadcast to group.
-            await Clients.Group(roomId).SendAsync("ReceiveMessage", Context.ConnectionId, message);
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveMessage", Context.ConnectionId, message);
+
         }
 
         public async Task SendSignal(string roomId, string signalJson)
