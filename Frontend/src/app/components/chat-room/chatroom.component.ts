@@ -184,9 +184,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sendMessage(): void {
     if (!this.newMessage.trim()) return;
-    this.signalrService.sendMessage(this.roomId, this.newMessage);
+    this.signalrService.sendMessage(this.roomId, this.newMessage, this.myRole);
     this.newMessage = '';
   }
+
 
 
   // WebRTC Call Logic

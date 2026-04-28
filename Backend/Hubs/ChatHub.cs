@@ -54,20 +54,12 @@ namespace Backend.Hubs
             await Clients.Group(roomId).SendAsync("UserJoined", Context.ConnectionId);
         }
 
-        public async Task SendMessage(string roomId, string message)
+        public async Task SendMessage(string roomId, string senderRole, string message)
         {
             _roomService.UpdateActivity(roomId);
-            var room = _roomService.GetRoom(roomId);
-            string senderRole = "Unknown";
-            if (room != null)
-            {
-                if (Context.ConnectionId == room.HostConnectionId)
-                    senderRole = "Host";
-                else if (Context.ConnectionId == room.GuestConnectionId)
-                    senderRole = "Guest";
-            }
             await Clients.Group(roomId).SendAsync("ReceiveMessage", senderRole, message);
         }
+
 
 
         public async Task NotifyActivity(string roomId, string reason)

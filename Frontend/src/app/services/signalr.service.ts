@@ -127,12 +127,13 @@ export class SignalrService {
       .catch(err => console.error('JoinRoom Error: ', err));
   }
 
-  public sendMessage(roomId: string, message: string): void {
+  public sendMessage(roomId: string, message: string, role: string): void {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      this.hubConnection.invoke('SendMessage', roomId, message)
+      this.hubConnection.invoke('SendMessage', roomId, role, message)
         .catch(err => console.error('SendMessage Error: ', err));
     }
   }
+
 
   public notifyActivity(roomId: string, reason: string): void {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {

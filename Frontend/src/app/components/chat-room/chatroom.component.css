@@ -2,11 +2,10 @@
   display: flex;
   height: 100dvh;
   overflow: hidden;
-  background: #0b141a; 
-  color: #e9edef;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #11100f; /* Microsoft Teams Dark theme base */
+  color: #f3f2f1;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
-
 
 .main-area {
   flex: 1;
@@ -18,28 +17,29 @@
 /* Video Section */
 .video-section {
   display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.3);
+  gap: 16px;
+  padding: 16px;
+  background: #201f1e;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #292827;
 }
 
 .video-wrapper {
   position: relative;
-  width: 300px;
-  height: 200px;
-  background: #1f2c34;
-  border-radius: 12px;
+  width: 280px;
+  height: 180px;
+  background: #292827;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #484644;
+  transition: all 0.3s ease;
 }
 
 .video-wrapper.remote {
-  border-color: #00a884; /* WhatsApp Green */
+  border-color: #5b5fc7; /* Teams Purple */
 }
 
 video {
@@ -50,12 +50,13 @@ video {
 
 .video-label {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(0,0,0,0.6);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(32, 31, 30, 0.75);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 /* Chat Section */
@@ -63,64 +64,58 @@ video {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-  padding: 24px;
+  background: #1f1f1f;
+  padding: 20px;
   overflow-y: auto;
 }
 
 .message {
-  max-width: 70%;
+  max-width: 65%;
   padding: 12px 16px;
-  border-radius: 16px;
+  border-radius: 8px;
   margin-bottom: 12px;
   font-size: 0.95rem;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-  position: relative;
-  animation: messageIn 0.3s ease-out;
-}
-
-@keyframes messageIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .message.incoming {
-  background: #202c33;
+  background: #292827;
   align-self: flex-start;
-  border-top-left-radius: 0;
+  color: #f3f2f1;
+  border-left: 4px solid #8b8cc7;
 }
 
 .message.outgoing {
-  background: #005c4b;
+  background: #3b3a39;
   align-self: flex-end;
-  border-top-right-radius: 0;
+  color: #f3f2f1;
+  border-right: 4px solid #5b5fc7;
 }
 
 .msg-sender {
-  font-size: 0.75rem;
-  color: #8696a0;
-  margin-bottom: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #a19f9d;
+  margin-bottom: 6px;
 }
 
 .msg-time {
   font-size: 0.7rem;
-  color: #8696a0;
+  color: #a19f9d;
   text-align: right;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 /* Controls & Input */
 .bottom-bar {
   display: flex;
-  padding: 10px 20px;
-  background: #202c33;
-  gap: 15px;
+  padding: 16px 24px;
+  background: #201f1e;
+  gap: 16px;
   align-items: center;
+  border-top: 1px solid #292827;
 }
 
 .call-controls {
@@ -133,56 +128,81 @@ video {
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: #2a3942;
-  color: #a8b4bb;
+  background: #292827;
+  color: #f3f2f1;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  border: 1px solid #484644;
 }
 
 .btn-icon:hover {
-  background: #374955;
-  color: #d1d7db;
+  background: #323130;
+  border-color: #605e5c;
 }
 
 .btn-icon.active {
-  background: #00a884;
-  color: #fff;
+  background: #5b5fc7;
+  color: #ffffff;
+  border-color: #5b5fc7;
 }
 
 .btn-icon.end {
-  background: #ea0038;
-  color: #fff;
+  background: #a80000;
+  color: #ffffff;
+  border-color: #a80000;
 }
 
 .btn-icon.end:hover {
-  background: #c2002e;
+  background: #8a0000;
 }
 
 .input-area {
   flex: 1;
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .input-area input {
   flex: 1;
-  padding: 10px 15px;
-  background: #2a3942;
-  border: none;
-  border-radius: 8px;
-  color: #d1d7db;
+  padding: 12px 16px;
+  background: #292827;
+  border: 1px solid #484644;
+  border-radius: 4px;
+  color: #f3f2f1;
   font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
 .input-area input:focus {
   outline: none;
+  border-color: #5b5fc7;
+  background: #323130;
 }
 
 .btn-send {
-  background: #00a884;
+  background: #5b5fc7;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-send:hover {
+  background: #4f52b2;
+}
+
+.btn-send:disabled {
+  background: #3b3a39;
+  color: #a19f9d;
+  cursor: not-allowed;
+}
+
   color: #fff;
   border: none;
   border-radius: 8px;
