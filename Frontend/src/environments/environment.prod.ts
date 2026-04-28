@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://invite-video-chat-backend.onrender.com'
+  apiUrl: 'https://chatserivcerd.onrender.com'
+
 };
