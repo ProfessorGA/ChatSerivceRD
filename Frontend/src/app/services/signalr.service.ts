@@ -11,7 +11,9 @@ export class SignalrService {
   private hubConnection!: signalR.HubConnection;
   
   // Observables for components
-  public message$ = new Subject<{ sender: string, content: string }>();
+  public message$ = new Subject<{ isMe: boolean, content: string }>();
+  public activityAlert$ = new Subject<string>();
+  public sessionEnded$ = new Subject<void>();
   public signal$ = new Subject<{ sender: string, data: string }>();
   public userJoined$ = new Subject<string>();
   public userLeft$ = new Subject<string>();
@@ -57,8 +59,18 @@ export class SignalrService {
 
   private registerHandlers(): void {
     this.hubConnection.on('ReceiveMessage', (sender: string, content: string) => {
-      this.message$.next({ sender, content });
+      const isMe = sender === this.hubConnection.connectionId;
+      this.message$.next({ isMe, content });
     });
+
+    this.hubConnection.on('ReceiveActivityAlert', (reason: string) => {
+      this.activityAlert$.next(reason);
+    });
+
+    this.hubConnection.on('SessionEnded', () => {
+      this.sessionEnded$.next();
+    });
+
 
     this.hubConnection.on('ReceiveSignal', (sender: string, data: string) => {
       this.signal$.next({ sender, data });
@@ -120,6 +132,21 @@ export class SignalrService {
         .catch(err => console.error('SendMessage Error: ', err));
     }
   }
+
+  public notifyActivity(roomId: string, reason: string): void {
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke('NotifyActivity', roomId, reason)
+        .catch(err => console.error('NotifyActivity Error: ', err));
+    }
+  }
+
+  public endSession(roomId: string): void {
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke('EndSession', roomId)
+        .catch(err => console.error('EndSession Error: ', err));
+    }
+  }
+
 
   public sendSignal(roomId: string, signalData: any): void {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {

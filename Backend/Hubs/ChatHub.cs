@@ -57,9 +57,19 @@ namespace Backend.Hubs
         public async Task SendMessage(string roomId, string message)
         {
             _roomService.UpdateActivity(roomId);
-            await Clients.OthersInGroup(roomId).SendAsync("ReceiveMessage", Context.ConnectionId, message);
-
+            await Clients.Group(roomId).SendAsync("ReceiveMessage", Context.ConnectionId, message);
         }
+
+        public async Task NotifyActivity(string roomId, string reason)
+        {
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveActivityAlert", reason);
+        }
+
+        public async Task EndSession(string roomId)
+        {
+            await Clients.Group(roomId).SendAsync("SessionEnded");
+        }
+
 
         public async Task SendSignal(string roomId, string signalJson)
         {

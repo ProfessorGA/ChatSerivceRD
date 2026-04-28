@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { SignalrService } from '../../services/signalr.service';
 import { WebrtcService } from '../../services/webrtc.service';
 import { Subscription } from 'rxjs';
@@ -50,9 +51,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private signalrService: SignalrService,
     private webrtcService: WebrtcService
   ) {}
+
 
   ngOnInit(): void {
     this.roomId = this.route.snapshot.paramMap.get('roomId') || '';
@@ -94,19 +97,15 @@ export class ChatRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
   private setupActivityTracking() {
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        this.triggerActivityAlert('Tab changed or Screen locked');
+        this.signalrService.notifyActivity(this.roomId, 'Tab changed or Screen locked');
       }
     });
 
     window.addEventListener('blur', () => {
-      this.triggerActivityAlert('App switched or Call attended');
+      this.signalrService.notifyActivity(this.roomId, 'App switched or Call attended');
     });
   }
 
-  private triggerActivityAlert(reason: string) {
-    this.activityPopupMessage = reason;
-    this.showActivityPopup = true;
-  }
 
   closePopup() {
     this.showActivityPopup = false;
@@ -131,10 +130,22 @@ export class ChatRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.subs.add(this.signalrService.message$.subscribe(msg => {
       this.messages.push({
         content: msg.content,
-        isMe: msg.sender === 'Me', // Handled locally when sending
+        isMe: msg.isMe,
         time: new Date()
       });
     }));
+
+    // Remote Activity Alerts
+    this.subs.add(this.signalrService.activityAlert$.subscribe(reason => {
+      this.activityPopupMessage = `Peer Alert: ${reason}`;
+      this.showActivityPopup = true;
+    }));
+
+    // Session Ended
+    this.subs.add(this.signalrService.sessionEnded$.subscribe(() => {
+      this.router.navigate(['/congratulations']);
+    }));
+
 
     // Peer Joined (For Host to initiate call if needed, or just log)
     this.subs.add(this.signalrService.peerConnected$.subscribe(() => {
@@ -173,18 +184,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sendMessage(): void {
     if (!this.newMessage.trim()) return;
-
     this.signalrService.sendMessage(this.roomId, this.newMessage);
-    
-    // Add locally
-    this.messages.push({
-      content: this.newMessage,
-      isMe: true,
-      time: new Date()
-    });
-
     this.newMessage = '';
   }
+
 
   // WebRTC Call Logic
   async startVideoCall() {
@@ -235,9 +238,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   endCall(): void {
     this.webrtcService.endCall();
-    // Optionally notify peer via SignalR
-    this.signalrService.sendSignal(this.roomId, { endCall: true });
+    this.signalrService.endSession(this.roomId);
   }
+
 
   private scrollToBottom(): void {
     try {
