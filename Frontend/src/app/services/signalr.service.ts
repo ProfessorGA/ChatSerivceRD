@@ -58,10 +58,11 @@ export class SignalrService {
   }
 
   private registerHandlers(): void {
-    this.hubConnection.on('ReceiveMessage', (sender: string, content: string) => {
-      const isMe = sender === this.hubConnection.connectionId;
+    this.hubConnection.on('ReceiveMessage', (senderRole: string, content: string) => {
+      const isMe = senderRole === this.roleAssigned$.value;
       this.message$.next({ isMe, content });
     });
+
 
     this.hubConnection.on('ReceiveActivityAlert', (reason: string) => {
       this.activityAlert$.next(reason);
