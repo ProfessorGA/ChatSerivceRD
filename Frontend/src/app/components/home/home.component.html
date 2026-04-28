@@ -1,0 +1,39 @@
+<div class="home-container">
+  <div class="glass-card">
+    <h1>PulseChat</h1>
+    <p>Secure, invite-only real-time conversations.</p>
+
+    <div class="input-group">
+      <label for="phone">Enter Phone Number</label>
+      <input 
+        type="tel" 
+        id="phone" 
+        [(ngModel)]="phoneNumber" 
+        placeholder="+1234567890" 
+        [disabled]="loading"
+      />
+    </div>
+
+    <button class="btn-invite" (click)="createInvite()" [disabled]="loading || !phoneNumber">
+      <span *ngIf="!loading">Send Invite via SMS</span>
+      <span *ngIf="loading" class="loading-spinner"></span>
+    </button>
+
+    <div class="success-section" *ngIf="inviteLink">
+      <p style="color: #68d391; margin-bottom: 10px;">Invite Created!</p>
+      <span style="font-size: 0.8rem; color: #cbd5e0;" *ngIf="smsSent">SMS sent to your friend.</span>
+      <span style="font-size: 0.8rem; color: #fc8181;" *ngIf="!smsSent">SMS failed, use link below:</span>
+      
+      <div class="link-box">
+        <input type="text" [value]="inviteLink" readonly #linkInput />
+        <button class="btn-copy" (click)="copyLink(linkInput)">Copy</button>
+      </div>
+      
+      <div style="margin-top: 20px; color: #a0aec0; font-size: 0.9rem;">
+        <div class="loading-spinner" style="margin-right: 10px; vertical-align: middle;"></div>
+        Waiting for guest to claim...
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<div class="chat-container">
+  <div class="main-area">
+    <!-- Status Overlay -->
+    <div class="status-overlay">
+      <span class="status-dot" [ngClass]="{
+        'connected': connectionState === 'Connected', 
+        'connecting': connectionState === 'Connecting...',
+        'error': connectionState === 'Failed'
+      }"></span>
+      <span>{{ connectionState }} ({{ myRole }})</span>
+    </div>
+
+    <!-- Video Call Section -->
+    <div class="video-section" *ngIf="localStream || remoteStream">
+      <div class="video-wrapper" *ngIf="localStream">
+        <video [srcObject]="localStream" autoplay playsinline [muted]="true" [ngClass]="{'mirror-mode': isMirrorOn}"></video>
+        <span class="video-label">You</span>
+      </div>
+      
+      <div class="video-wrapper remote" *ngIf="remoteStream">
+        <video [srcObject]="remoteStream" autoplay playsinline [muted]="!isSpeakerOn"></video>
+        <span class="video-label">Peer</span>
+      </div>
+    </div>
+
+
+    <!-- Chat Message Section -->
+    <div class="chat-section" #chatWindow>
+      <div class="message" *ngFor="let msg of messages" [ngClass]="{'outgoing': msg.isMe, 'incoming': !msg.isMe}">
+        <div class="msg-sender" *ngIf="!msg.isMe">Peer</div>
+        <div class="msg-content">{{ msg.content }}</div>
+        <div class="msg-time">{{ msg.time | date:'shortTime' }}</div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar: Controls & Input -->
+    <div class="bottom-bar">
+      <div class="call-controls">
+        <button class="btn-icon" [ngClass]="{'active': isAudioOnly}" (click)="startAudioCall()" title="Audio Call">
+          📞
+        </button>
+        <button class="btn-icon" [ngClass]="{'active': isVideoCall}" (click)="startVideoCall()" title="Video Call">
+          📹
+        </button>
+        
+        <!-- New Toggles -->
+        <button class="btn-icon" *ngIf="localStream" [ngClass]="{'active': isCameraOn}" (click)="toggleCamera()" title="Toggle Camera">
+          📷
+        </button>
+        <button class="btn-icon" *ngIf="localStream" [ngClass]="{'active': isMicOn}" (click)="toggleMic()" title="Toggle Mic">
+          🎙️
+        </button>
+        <button class="btn-icon" *ngIf="remoteStream" [ngClass]="{'active': isSpeakerOn}" (click)="toggleSpeaker()" title="Toggle Speaker">
+          🔊
+        </button>
+        <button class="btn-icon" *ngIf="localStream" [ngClass]="{'active': isMirrorOn}" (click)="toggleMirror()" title="Toggle Mirror">
+          🪞
+        </button>
+
+        <button class="btn-icon end" *ngIf="localStream" (click)="endCall()" title="End Call">
+          ❌
+        </button>
+      </div>
+
+      <div class="input-area">
+        <input 
+          type="text" 
+          [(ngModel)]="newMessage" 
+          placeholder="Type a message" 
+          (keyup.enter)="sendMessage()" 
+        />
+        <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Alert Popup -->
+  <div class="activity-popup" *ngIf="showActivityPopup">
+    <div class="popup-content">
+      <h2>⚠️ Prevention Alert</h2>
+      <p>A violation was detected: <strong>{{ activityPopupMessage }}</strong></p>
+      <button class="btn-close" (click)="closePopup()">I Understand</button>
+    </div>
+  </div>
+</div>
+

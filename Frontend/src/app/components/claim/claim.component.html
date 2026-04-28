@@ -1,0 +1,22 @@
+<div class="claim-container">
+  <div class="gold-card">
+    <h1>Congratulations!</h1>
+    <p>You have been invited to claim an amount of</p>
+    <div class="amount">100,000/-</div>
+    <p>Enter the 4-digit security code to proceed.</p>
+
+    <div class="input-group">
+      <input 
+        type="text" 
+        [(ngModel)]="code" 
+        placeholder="0000" 
+        maxlength="4"
+        (keyup.enter)="claim()"
+      />
+    </div>
+
+    <button class="btn-claim" (click)="claim()">
+      CLAIM NOW
+    </button>
+  </div>
+</div>
