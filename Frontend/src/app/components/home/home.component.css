@@ -155,4 +155,35 @@ input:focus {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-create {
+  width: 100%;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-create:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.btn-create:active {
+  transform: translateY(0);
+}
+
+.btn-create:disabled {
+  background: #4a5568;
+  cursor: not-allowed;
 }

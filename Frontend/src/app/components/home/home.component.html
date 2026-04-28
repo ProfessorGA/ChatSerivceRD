@@ -14,10 +14,18 @@
       />
     </div>
 
-    <button class="btn-invite" (click)="createInvite()" [disabled]="loading || !phoneNumber">
-      <span *ngIf="!loading">Send Invite via SMS</span>
-      <span *ngIf="loading" class="loading-spinner"></span>
-    </button>
+    <div class="button-group">
+      <button class="btn-invite" (click)="createInvite(true)" [disabled]="loading || !phoneNumber">
+        <span *ngIf="!loading">Send Room</span>
+        <span *ngIf="loading" class="loading-spinner"></span>
+      </button>
+
+      <button class="btn-create" (click)="createInvite(false)" [disabled]="loading">
+        <span *ngIf="!loading">Create Room</span>
+        <span *ngIf="loading" class="loading-spinner"></span>
+      </button>
+    </div>
+
 
     <div class="success-section" *ngIf="inviteLink">
       <p style="color: #68d391; margin-bottom: 10px;">Invite Created!</p>

@@ -20,12 +20,13 @@ namespace Backend.Controllers
         [HttpPost("create")]
         public IActionResult CreateInvite([FromBody] InviteRequest request)
         {
-            if (string.IsNullOrEmpty(request.PhoneNumber))
+            if (request.SendSms != false && string.IsNullOrEmpty(request.PhoneNumber))
             {
                 return BadRequest(new { message = "Phone number is required." });
             }
 
-            var roomId = _roomService.CreateRoom(request.PhoneNumber);
+            var phoneNumber = string.IsNullOrEmpty(request.PhoneNumber) ? "MANUAL" : request.PhoneNumber;
+            var roomId = _roomService.CreateRoom(phoneNumber);
             
             var frontendUrl = "http://localhost:4200"; // Fallback
             if (Request.Headers.TryGetValue("Origin", out var originValues))
@@ -38,8 +39,13 @@ namespace Backend.Controllers
             }
             var inviteLink = $"{frontendUrl}/join/{roomId}";
 
+            bool smsSent = false;
+            string? errorMessage = null;
 
-            var (smsSent, errorMessage) = _smsService.SendInviteSms(request.PhoneNumber, inviteLink);
+            if (request.SendSms != false)
+            {
+                (smsSent, errorMessage) = _smsService.SendInviteSms(request.PhoneNumber, inviteLink);
+            }
 
             return Ok(new 
             { 
@@ -47,10 +53,10 @@ namespace Backend.Controllers
                 inviteLink = inviteLink, 
                 smsSent = smsSent,
                 errorMessage = errorMessage,
-
                 message = "Invite created successfully."
             });
         }
+
 
         [HttpGet("join/{roomId}")]
         public IActionResult ValidateJoin(string roomId)
@@ -73,5 +79,7 @@ namespace Backend.Controllers
     public class InviteRequest
     {
         public string PhoneNumber { get; set; } = string.Empty;
+        public bool? SendSms { get; set; }
     }
+
 }

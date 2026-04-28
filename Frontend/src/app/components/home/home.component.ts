@@ -32,9 +32,11 @@ export class HomeComponent {
     private signalrService: SignalrService
   ) {}
 
-  createInvite() {
+  createInvite(sendSms: boolean = true) {
     this.loading = true;
-    this.http.post<any>(`${this.apiUrl}/create`, { phoneNumber: this.phoneNumber })
+    const payload = sendSms ? { phoneNumber: this.phoneNumber, sendSms: true } : { phoneNumber: '', sendSms: false };
+    this.http.post<any>(`${this.apiUrl}/create`, payload)
+
       .subscribe({
         next: (res) => {
           console.log('Create Invite API Response:', res);
