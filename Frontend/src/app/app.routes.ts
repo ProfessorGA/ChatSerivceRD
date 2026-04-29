@@ -12,6 +12,8 @@ export const routes: Routes = [
   { path: 'avoid/:roomId', component: AvoidComponent },
   { path: 'chat/:roomId', component: ChatRoomComponent },
   { path: 'congratulations', component: CongratulationsComponent },
+  { path: 'admin', loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent) },
   { path: '**', redirectTo: '' }
+
 ];
 

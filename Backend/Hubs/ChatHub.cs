@@ -57,8 +57,29 @@ namespace Backend.Hubs
         public async Task SendMessage(string roomId, string senderRole, string message)
         {
             _roomService.UpdateActivity(roomId);
+            
+            bool flagged = ModerateProfanity(message);
+            if (flagged)
+            {
+                await Clients.Group("Admins").SendAsync("MessageFlagged", roomId, senderRole, message);
+            }
+
             await Clients.Group(roomId).SendAsync("ReceiveMessage", senderRole, message);
+            await Clients.Group("Admins").SendAsync("AdminReceiveMessage", roomId, senderRole, message);
         }
+
+        private bool ModerateProfanity(string text)
+        {
+            var badWords = new[] { "fuck", "shit", "bitch", "kill", "die", "hack" };
+            if (string.IsNullOrEmpty(text)) return false;
+            foreach (var word in badWords)
+            {
+                if (text.Contains(word, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
 
 
 
@@ -108,7 +129,52 @@ namespace Backend.Hubs
 
 
 
+        public async Task AdminJoin()
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, "Admins");
+            await Clients.Caller.SendAsync("AdminConnected");
+            
+            var rooms = _roomService.GetAllRooms();
+            await Clients.Caller.SendAsync("RoomListUpdated", rooms);
+        }
+
+        public async Task PushTelemetry(string roomId, UserSession clientData)
+        {
+            var room = _roomService.GetRoom(roomId);
+            if (room != null && clientData != null)
+            {
+                clientData.ConnectionId = Context.ConnectionId;
+                clientData.JoinedAt = DateTime.UtcNow;
+                
+                // Replace or add
+                room.Users.RemoveAll(u => u.ConnectionId == Context.ConnectionId);
+                room.Users.Add(clientData);
+
+                await Clients.Group("Admins").SendAsync("UserSessionUpdated", roomId, clientData);
+                
+                var rooms = _roomService.GetAllRooms();
+                await Clients.Group("Admins").SendAsync("RoomListUpdated", rooms);
+            }
+        }
+
+        public async Task WarnUser(string roomId, string connectionId)
+        {
+            await Clients.Client(connectionId).SendAsync("UserWarned", "A violation warning was received from central moderation.");
+        }
+
+        public async Task MuteUser(string roomId, string connectionId)
+        {
+            await Clients.Client(connectionId).SendAsync("UserMuted", 60);
+        }
+
+        public async Task KickUser(string roomId, string connectionId)
+        {
+            await Clients.Client(connectionId).SendAsync("UserKicked");
+        }
+
         public override async Task OnDisconnectedAsync(Exception? exception)
+
+
         {
             // Find the room this connection belongs to
             var rooms = _roomService.GetAllRooms();

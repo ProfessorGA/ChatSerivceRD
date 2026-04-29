@@ -1,0 +1,86 @@
+<div class="admin-root">
+  <!-- Login View -->
+  <div class="login-overlay" *ngIf="!isAuthenticated">
+    <div class="login-card">
+      <h2>🔒 Admin Portal</h2>
+      <input type="text" [(ngModel)]="username" placeholder="Username" class="admin-input" />
+      <input type="password" [(ngModel)]="password" placeholder="Password" class="admin-input" />
+      <button (click)="login()" class="admin-btn primary">Access Dashboard</button>
+      <p class="error-text" *ngIf="authError">{{ authError }}</p>
+    </div>
+  </div>
+
+  <!-- Dashboard View -->
+  <div class="dashboard-container" *ngIf="isAuthenticated">
+    <aside class="sidebar">
+      <h3>📊 Telemetry Hub</h3>
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-lbl">Active Rooms</span>
+          <span class="stat-val">{{ rooms.length }}</span>
+        </div>
+      </div>
+      
+      <div class="room-list">
+        <div 
+          *ngFor="let r of rooms" 
+          class="room-card" 
+          [class.active]="selectedRoom?.roomId === r.roomId"
+          (click)="selectRoom(r)"
+        >
+          <span class="room-id">Room: {{ r.roomId.slice(0,8) }}...</span>
+          <span class="room-meta">Users: {{ r.users?.length || 0 }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="panel-header">
+        <h2>Room Details: {{ selectedRoom?.roomId || 'Select a session' }}</h2>
+      </header>
+
+      <section class="empty-state" *ngIf="!selectedRoom">
+        <div class="placeholder-icon">📡</div>
+        <p>Awaiting supervisor assignment.</p>
+      </section>
+
+      <!-- Live Room Metrics -->
+      <div class="room-details" *ngIf="selectedRoom">
+        <div class="details-grid">
+          <!-- User List -->
+          <div class="detail-section">
+            <h3>Live User Sessions</h3>
+            <div class="user-card" *ngFor="let u of selectedRoom.users">
+              <div class="user-meta">
+                <strong>User ID:</strong> {{ u.connectionId }} <br>
+                <strong>Browser:</strong> {{ u.browser }} ({{ u.os }}) <br>
+                <strong>IP / Geo:</strong> {{ u.ipAddress }} - {{ u.approxLocation }} <br>
+                <strong>Device:</strong> {{ u.deviceType }} | {{ u.screenResolution }} <br>
+                <strong>Network:</strong> {{ u.networkType }} <br>
+                <strong>Live Hardware:</strong> Battery: {{ u.batteryCharge }}% | Coords: {{ u.liveLocation }} <br>
+                <strong>Violations:</strong> {{ u.violationCount }}
+              </div>
+              
+              <div class="action-group">
+                <button class="admin-btn warn" (click)="warnUser(u.connectionId)">Warn</button>
+                <button class="admin-btn mute" (click)="muteUser(u.connectionId)">Mute (60s)</button>
+                <button class="admin-btn kick" (click)="kickUser(u.connectionId)">Kick</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Stream -->
+          <div class="detail-section">
+            <h3>Real-Time Chat Stream</h3>
+            <div class="chat-box">
+              <div class="chat-msg" *ngFor="let msg of activeRoomMessages">
+                <span class="sender-lbl" [class.flagged]="msg.flagged">[{{ msg.role }}]:</span>
+                <span class="msg-text" [class.flagged]="msg.flagged">{{ msg.content }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
