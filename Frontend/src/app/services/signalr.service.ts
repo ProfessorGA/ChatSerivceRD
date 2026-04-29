@@ -31,7 +31,7 @@ export class SignalrService {
 
 
 
-  public startConnection(roomId: string): void {
+  public startConnection(roomId?: string): void {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${this.backendUrl}/hubs/chat`, {
         skipNegotiation: true,
@@ -47,8 +47,11 @@ export class SignalrService {
       .then(() => {
         this.connectionState$.next('Connected');
         console.log('SignalR Connected');
-        this.joinRoom(roomId);
+        if (roomId) {
+          this.joinRoom(roomId);
+        }
       })
+
       .catch(err => {
         this.connectionState$.next('Failed');
         console.error('SignalR Connection Error: ', err);

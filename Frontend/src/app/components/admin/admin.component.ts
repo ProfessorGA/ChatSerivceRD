@@ -42,11 +42,36 @@ export class AdminComponent implements OnInit {
   login() {
     if (this.username === 'admin' && this.password === 'admin123') {
       this.isAuthenticated = true;
-      this.signalrService.hubConnection?.invoke('AdminJoin');
+      this.signalrService.startConnection();
+      
+      const sub = this.signalrService.connectionState$.subscribe(state => {
+        if (state === 'Connected') {
+          this.signalrService.hubConnection?.invoke('AdminJoin');
+          
+          this.signalrService.hubConnection?.on('RoomListUpdated', (rooms: any[]) => {
+            this.rooms = rooms;
+          });
+
+          this.signalrService.hubConnection?.on('AdminReceiveMessage', (roomId: string, role: string, content: string) => {
+            if (this.selectedRoom?.roomId === roomId) {
+              this.activeRoomMessages.push({ role, content, flagged: false });
+            }
+          });
+
+          this.signalrService.hubConnection?.on('MessageFlagged', (roomId: string, role: string, content: string) => {
+            if (this.selectedRoom?.roomId === roomId) {
+              this.activeRoomMessages.push({ role, content, flagged: true });
+            }
+          });
+
+          sub.unsubscribe();
+        }
+      });
     } else {
       this.authError = 'Access unauthorized.';
     }
   }
+
 
   selectRoom(room: any) {
     this.selectedRoom = room;
