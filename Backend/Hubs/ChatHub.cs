@@ -2,7 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Backend.Services;
+using Backend.Models;
 using Microsoft.Extensions.Logging;
+
 
 namespace Backend.Hubs
 {
