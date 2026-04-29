@@ -8,7 +8,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class SignalrService {
-  private hubConnection!: signalR.HubConnection;
+  public hubConnection!: signalR.HubConnection;
+
   
   // Observables for components
   public message$ = new Subject<{ isMe: boolean, content: string }>();
